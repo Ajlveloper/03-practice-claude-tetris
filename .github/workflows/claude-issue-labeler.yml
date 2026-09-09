@@ -1,0 +1,37 @@
+name: Claude Issue Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude to label issue
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Analiza el issue #${{ github.event.issue.number }} de este repositorio (título y cuerpo) y asígnale las labels apropiadas ejecutando `gh issue edit`.
+
+            Labels preferidas (usa estas siempre que apliquen, puedes asignar una o varias):
+            - bug: reporta un comportamiento incorrecto o error
+            - enhancement: solicita una mejora o nueva funcionalidad
+            - documentation: relacionado con el README u otra documentación
+            - question: es una pregunta o solicitud de aclaración
+
+            Solo si ninguna de las labels anteriores describe bien el issue, puedes crear una label nueva, breve y descriptiva (en minúsculas, estilo kebab-case) con `gh label create` y asignarla. Antes de crear una, revisa con `gh label list` si ya existe una equivalente en el repo para no duplicar.
+
+            Si el issue ya tiene labels que ya no aplican según el contenido actual, quítalas. No comentes en el issue, únicamente actualiza sus labels.
+          claude_args: '--allowedTools "Bash(gh issue edit:*),Bash(gh issue view:*),Bash(gh label list:*),Bash(gh label create:*)"'
