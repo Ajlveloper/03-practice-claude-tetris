@@ -26,5 +26,6 @@ Verify changes by loading the page and playing; there is no test suite to run.
 ## Gotchas
 
 - `COLS`/`ROWS`/`BLOCK` in `game.js` must stay in sync with the hardcoded `width`/`height` of `<canvas id="board">` in `index.html` (300×600 = 10×30 by 20×30). Same for `#next-canvas` (120×120) and the `NB = 30` constant in `drawNext`.
-- `game.js` grabs DOM ids at load time (`board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`). Renaming any id in `index.html` breaks the script at startup.
+- `game.js` grabs DOM ids at load time (`board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`, `theme-toggle`). Renaming any id in `index.html` breaks the script at startup.
+- Theme (light/dark) is CSS-variable driven: colors live under `:root` (dark, default) and `:root.light` in `style.css`. The canvas grid line color isn't CSS, so `game.js` reads the `--grid-line` custom property via `getComputedStyle` whenever the theme toggles — keep that in sync if new canvas-drawn colors are added. Preference persists in `localStorage` under `tetris-theme`.
 - User-facing strings are Spanish (`PAUSA`, `Puntuación`, `Reiniciar`); README is Spanish too. Keep new UI text in Spanish.
